@@ -1,4 +1,4 @@
-name: Deploy Application Docker Image to Azure Web App Service 
+name: Deploy Application Docker Image to Azure Web App Service
 
 on:
   push:
@@ -27,14 +27,9 @@ jobs:
       - name: Build and Push Application Image to Azure Container Registry
         id: docker-push
         run: |
-          # Convert repo name to lowercase
-          repo_name=$(echo "${{ secrets.REPO_NAME }}" | tr '[:upper:]' '[:lower:]')
-          docker build -t ${{ secrets.AZURE_LOGIN_SERVER }}/${repo_name}:${{ github.sha }} .
-          docker push ${{ secrets.AZURE_LOGIN_SERVER }}/${repo_name}:${{ github.sha }}
+          docker build -t ${{ secrets.AZURE_LOGIN_SERVER }}/${{ secrets.REPO_NAME }}:${{ github.sha }} .
 
-      - name: Set Environment Variables
-        run: |
-          echo "REPO_NAME=$(echo '${{ secrets.REPO_NAME }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          docker push ${{ secrets.AZURE_LOGIN_SERVER }}/${{ secrets.REPO_NAME }}:${{ github.sha }}
 
       - name: Login via Azure CLI
         uses: azure/login@v1
@@ -45,4 +40,4 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: ineuronfaceapp
-          images: ${{ secrets.AZURE_LOGIN_SERVER }}/$REPO_NAME:${{ github.sha }}
+          images: ${{ secrets.AZURE_LOGIN_SERVER }}/${{ secrets.REPO_NAME }}:${{ github.sha }}
